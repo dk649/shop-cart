@@ -98,6 +98,11 @@ products.forEach((product) => {
   productsWrapperEl.appendChild(productEl);
 });
 
+// add filter event listeners
+
+filtersContainer.addEventListener("change", filterProducts);
+searchInput.addEventListener("input", filterProducts);
+
 // Create product element
 
 function createProductElement(product) {
@@ -120,7 +125,66 @@ function createProductElement(product) {
 <p class="text-xl">${product.name}</p>
 <strong>€${product.price.toLocaleString()}</strong>`;
 
-  return productEl;
-
   productEl.querySelector(".status").addEventListener("click", addToCart);
+
+  return productEl;
+}
+
+// add remove from cary
+
+function addToCart(event) {
+  // console.log("add to cart");
+
+  const statusEl = event.target;
+  // console.log(statusEl);
+
+  if (statusEl.classList.contains("added")) {
+    // remove from cart
+    statusEl.classList.remove("added");
+    statusEl.innerText = "Add to Cart";
+    statusEl.classList.remove("bg-red-600");
+    statusEl.classList.add("bg-gray-800");
+    cartItemCount--;
+  } else {
+    // Add to cart
+    statusEl.classList.add("added");
+
+    statusEl.innerText = "Remove from Cart";
+    statusEl.classList.remove("bg-gray-800");
+    statusEl.classList.add("bg-red-600");
+
+    cartItemCount++;
+  }
+
+  // update cart items count
+
+  cartCount.innerText = cartItemCount.toString();
+}
+
+function filterProducts(event) {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  const checkedCategories = Array.from(checkEls)
+    .filter((check) => check.checked)
+    .map((check) => check.id);
+
+  // console.log(checkedCategories);
+
+  // Loop over products and check for matches
+
+  productEls.forEach((productEl, index) => {
+    const product = products[index];
+
+    // check to see if product matches the search or checked items
+
+    const matchesSearchTerm = product.name.toLowerCase().includes(searchTerm);
+    const isInCheckedCategory =
+      checkedCategories.length === 0 ||
+      checkedCategories.includes(product.type);
+
+    if (matchesSearchTerm && isInCheckedCategory) {
+      productEl.classList.remove("hidden");
+    } else {
+      productEl.classList.add("hidden");
+    }
+  });
 }
